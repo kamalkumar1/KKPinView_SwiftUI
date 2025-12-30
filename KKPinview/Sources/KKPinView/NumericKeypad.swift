@@ -8,9 +8,9 @@
 import SwiftUI
 
 @available(iOS 15.0, *)
-struct NumericKeypad: View {
-    let onNumberTap: (String) -> Void
-    let onDeleteTap: () -> Void
+public struct NumericKeypad: View {
+    public let onNumberTap: (String) -> Void
+    public let onDeleteTap: () -> Void
     
     @State private var pressedButton: String? = nil
     
@@ -28,7 +28,7 @@ struct NumericKeypad: View {
         self.onDeleteTap = onDeleteTap
     }
     
-    var body: some View {
+    public var body: some View {
         VStack(spacing: 16) {
             ForEach(0..<numbers.count, id: \.self) { rowIndex in
                 HStack(spacing: 16) {
@@ -95,15 +95,35 @@ struct NumericKeypad: View {
 }
 
 @available(iOS 15.0, *)
-struct KeypadButton: View {
-    let value: String
-    let isPressed: Bool
-    var text: String? = nil
-    var icon: Image? = nil
-    let fontSize: CGFloat
-    let fontWeight: Font.Weight
-    var buttonType: PinTextFieldType = AppConstants.defaultTextFieldType
-    let onTap: () -> Void
+public struct KeypadButton: View {
+    public let value: String
+    public let isPressed: Bool
+    public var text: String? = nil
+    public var icon: Image? = nil
+    public let fontSize: CGFloat
+    public let fontWeight: Font.Weight
+    public var buttonType: PinTextFieldType = AppConstants.defaultTextFieldType
+    public let onTap: () -> Void
+    
+    public init(
+        value: String,
+        isPressed: Bool,
+        text: String? = nil,
+        icon: Image? = nil,
+        fontSize: CGFloat,
+        fontWeight: Font.Weight,
+        buttonType: PinTextFieldType = AppConstants.defaultTextFieldType,
+        onTap: @escaping () -> Void
+    ) {
+        self.value = value
+        self.isPressed = isPressed
+        self.text = text
+        self.icon = icon
+        self.fontSize = fontSize
+        self.fontWeight = fontWeight
+        self.buttonType = buttonType
+        self.onTap = onTap
+    }
     
     // MARK: - Background Shape Based on Type
     @ViewBuilder
@@ -126,7 +146,7 @@ struct KeypadButton: View {
         }
     }
     
-    var body: some View {
+    public var body: some View {
         Button(action: onTap) {
             Group {
                 if let icon = icon {

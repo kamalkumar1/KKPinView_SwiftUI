@@ -8,23 +8,36 @@
 import SwiftUI
 
 @available(iOS 15.0, *)
-struct PinDigitField: View {
-    @Binding var text: String
-    let isFocused: Bool
-    var fieldSize: CGFloat?
-    var fieldType: PinTextFieldType = AppConstants.defaultTextFieldType
+public struct PinDigitField: View {
+    @Binding public var text: String
+    public let isFocused: Bool
+    public var fieldSize: CGFloat?
+    public var fieldType: PinTextFieldType = AppConstants.defaultTextFieldType
+    
+    public init(
+        text: Binding<String>,
+        isFocused: Bool,
+        fieldSize: CGFloat? = nil,
+        fieldType: PinTextFieldType = AppConstants.defaultTextFieldType
+    ) {
+        self._text = text
+        self.isFocused = isFocused
+        self.fieldSize = fieldSize
+        self.fieldType = fieldType
+    }
     @State private var fontSize: CGFloat = 8
     @State private var displayText: String = ""
     @State private var opacity: Double = 1.0
     @State private var showSecure: Bool = false
+    @State private var previousText: String = ""
     
     // Secure character to display
     private let secureCharacter: String = "●"
     
     // MARK: - Frame Dimensions (Fixed for all screen types)
-    static let fieldHeight: CGFloat = 70
-    static let normalFontSize: CGFloat = 24
-    static let smallFontSize: CGFloat = 8
+    public static let fieldHeight: CGFloat = 70
+    public static let normalFontSize: CGFloat = 24
+    public static let smallFontSize: CGFloat = 8
     
     // Equal width and height (circular shape - market standard)
     private var size: CGFloat {
@@ -52,7 +65,7 @@ struct PinDigitField: View {
         }
     }
     
-    var body: some View {
+    public var body: some View {
         ZStack {
             // Background - Shape based on fieldType
             backgroundShape
@@ -78,7 +91,10 @@ struct PinDigitField: View {
                 .frame(width: size, height: size)
                 .disabled(true)
         }
-        .onChange(of: text) { oldValue, newValue in
+        .onChange(of: text) { newValue in
+            let oldValue = previousText
+            previousText = newValue
+            
             // Animate font size from small to big when text appears
             if oldValue.isEmpty && !newValue.isEmpty {
                 displayText = newValue
@@ -116,6 +132,7 @@ struct PinDigitField: View {
         }
         .onAppear {
             // Set initial font size and display text based on text state
+            previousText = text
             displayText = text
             fontSize = text.isEmpty ? Self.smallFontSize : Self.normalFontSize
             opacity = text.isEmpty ? 0.0 : 1.0

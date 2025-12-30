@@ -8,8 +8,10 @@
 import SwiftUI
 
 @available(iOS 15.0, *)
-struct PinBackgroundView: View {
-    var body: some View {
+public struct PinBackgroundView: View {
+    public init() {}
+    
+    public var body: some View {
         ZStack {
             // Base gradient background
             Color.appGradient

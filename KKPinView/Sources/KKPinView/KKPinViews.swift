@@ -1,5 +1,5 @@
 //
-//  KKPinView.swift
+//  KKPinViews.swift
 //  KKPinView
 //
 //  Created by kamalkumar on 27/12/25.
@@ -8,8 +8,10 @@
 import SwiftUI
 
 @available(iOS 15.0, *)
-struct KKPinView: View {
-    static let totalDigits: Int = 4
+public struct KKPinViews: View {
+    public static let totalDigits: Int = 4
+    
+    public init() {}
     @State private var pinDigits: [String] = Array(repeating: "", count: totalDigits)
     @State private var currentFieldIndex: Int = 0
     
@@ -17,7 +19,7 @@ struct KKPinView: View {
         pinDigits.firstIndex(where: { $0.isEmpty }) ?? 0
     }
     
-    var body: some View {
+    public var body: some View {
         ZStack(alignment: .center) {
             // Beautiful gradient background with decorative elements
             PinBackgroundView()
@@ -96,5 +98,5 @@ struct KKPinView: View {
 }
 
 #Preview {
-    KKPinView()
+    KKPinViews()
 }

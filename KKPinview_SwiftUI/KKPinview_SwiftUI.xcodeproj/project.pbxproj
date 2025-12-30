@@ -6,6 +6,10 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		8ACFCCF82F0443770009C9CA /* KKPinView in Frameworks */ = {isa = PBXBuildFile; productRef = 8ACFCCF72F0443770009C9CA /* KKPinView */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXContainerItemProxy section */
 		8ACFCC9E2F043B5A0009C9CA /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -53,6 +57,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				8ACFCCF82F0443770009C9CA /* KKPinView in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -114,6 +119,7 @@
 			);
 			name = KKPinview_SwiftUI;
 			packageProductDependencies = (
+				8ACFCCF72F0443770009C9CA /* KKPinView */,
 			);
 			productName = KKPinview_SwiftUI;
 			productReference = 8ACFCC902F043B590009C9CA /* KKPinview_SwiftUI.app */;
@@ -197,6 +203,9 @@
 			);
 			mainGroup = 8ACFCC872F043B590009C9CA;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				8ACFCCF62F0443760009C9CA /* XCLocalSwiftPackageReference "../KKPinView" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 8ACFCC912F043B590009C9CA /* Products */;
 			projectDirPath = "";
@@ -572,6 +581,20 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCLocalSwiftPackageReference section */
+		8ACFCCF62F0443760009C9CA /* XCLocalSwiftPackageReference "../KKPinView" */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = ../KKPinView;
+		};
+/* End XCLocalSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		8ACFCCF72F0443770009C9CA /* KKPinView */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = KKPinView;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 8ACFCC882F043B590009C9CA /* Project object */;
 }

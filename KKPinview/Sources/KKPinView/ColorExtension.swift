@@ -8,20 +8,21 @@
 import SwiftUI
 
 // MARK: - App Colors
+@available(iOS 15.0, *)
 extension Color {
-    static var appGradientStart: Color {
+    public static var appGradientStart: Color {
         Color(red: 0.12, green: 0.50, blue: 0.99)
     }
     
-    static var appGradientEnd: Color {
+    public static var appGradientEnd: Color {
         Color(red: 0.08, green: 0.38, blue: 0.90)
     }
     
-    static var appSelectedColor: Color {
+    public static var appSelectedColor: Color {
         appGradientStart
     }
     
-    static var appGradient: LinearGradient {
+    public static var appGradient: LinearGradient {
         LinearGradient(
             colors: [appGradientStart, appGradientEnd],
             startPoint: .leading,

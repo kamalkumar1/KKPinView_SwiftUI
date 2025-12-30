@@ -8,12 +8,13 @@
 import SwiftUI
 
 // MARK: - Pin Text Field Type
-enum PinTextFieldType {
+@available(iOS 15.0, *)
+public enum PinTextFieldType: Sendable {
     case rectangle
     case roundCorner
     case withCornerRadius(CGFloat)
     
-    var cornerRadius: CGFloat {
+    public var cornerRadius: CGFloat {
         switch self {
         case .rectangle:
             return 0
@@ -26,7 +27,8 @@ enum PinTextFieldType {
 }
 
 // MARK: - App Constants
-struct AppConstants {
-    static let defaultTextFieldType: PinTextFieldType = .roundCorner
+@available(iOS 15.0, *)
+public struct AppConstants {
+    public static let defaultTextFieldType: PinTextFieldType = .roundCorner
 }
 
