@@ -7,24 +7,11 @@
 
 import SwiftUI
 
-@available(iOS 15.0, *)
-public struct PinDigitField: View {
-    @Binding public var text: String
-    public let isFocused: Bool
-    public var fieldSize: CGFloat?
-    public var fieldType: PinTextFieldType = AppConstants.defaultTextFieldType
-    
-    public init(
-        text: Binding<String>,
-        isFocused: Bool,
-        fieldSize: CGFloat? = nil,
-        fieldType: PinTextFieldType = AppConstants.defaultTextFieldType
-    ) {
-        self._text = text
-        self.isFocused = isFocused
-        self.fieldSize = fieldSize
-        self.fieldType = fieldType
-    }
+struct PinDigitField: View {
+    @Binding var text: String
+    let isFocused: Bool
+    var fieldSize: CGFloat?
+    var fieldType: PinTextFieldType = KKPinviewConstant.defaultTextFieldType
     @State private var fontSize: CGFloat = 8
     @State private var displayText: String = ""
     @State private var opacity: Double = 1.0
@@ -32,12 +19,12 @@ public struct PinDigitField: View {
     @State private var previousText: String = ""
     
     // Secure character to display
-    private let secureCharacter: String = "●"
+    private let secureCharacter: String = KKPinviewConstant.secureCharacter
     
     // MARK: - Frame Dimensions (Fixed for all screen types)
-    public static let fieldHeight: CGFloat = 70
-    public static let normalFontSize: CGFloat = 24
-    public static let smallFontSize: CGFloat = 8
+    static let fieldHeight: CGFloat = KKPinviewConstant.fieldHeight
+    static let normalFontSize: CGFloat = KKPinviewConstant.normalFontSize
+    static let smallFontSize: CGFloat = KKPinviewConstant.smallFontSize
     
     // Equal width and height (circular shape - market standard)
     private var size: CGFloat {
@@ -50,22 +37,34 @@ public struct PinDigitField: View {
         switch fieldType {
         case .rectangle:
             Rectangle()
-                .fill(Color.white.opacity(0.2))
+                .fill(KKPinviewConstant.fieldBackgroundColor)
+                .overlay(
+                    Rectangle()
+                        .stroke(KKPinviewConstant.fieldStrokeColor, lineWidth: KKPinviewConstant.fieldStrokeWidth)
+                )
                 .frame(width: size, height: size)
         case .roundCorner:
             // Fully round (Circle)
             Circle()
-                .fill(Color.white.opacity(0.2))
+                .fill(KKPinviewConstant.fieldBackgroundColor)
+                .overlay(
+                    Circle()
+                        .stroke(KKPinviewConstant.fieldStrokeColor, lineWidth: KKPinviewConstant.fieldStrokeWidth)
+                )
                 .frame(width: size, height: size)
         case .withCornerRadius:
             // Rounded rectangle with corner radius
             RoundedRectangle(cornerRadius: fieldType.cornerRadius)
-                .fill(Color.white.opacity(0.2))
+                .fill(KKPinviewConstant.fieldBackgroundColor)
+                .overlay(
+                    RoundedRectangle(cornerRadius: fieldType.cornerRadius)
+                        .stroke(KKPinviewConstant.fieldStrokeColor, lineWidth: KKPinviewConstant.fieldStrokeWidth)
+                )
                 .frame(width: size, height: size)
         }
     }
     
-    public var body: some View {
+    var body: some View {
         ZStack {
             // Background - Shape based on fieldType
             backgroundShape
@@ -73,8 +72,8 @@ public struct PinDigitField: View {
             // Text display with animated font size
             // Show secure character if enabled, otherwise show actual text
             Text(showSecure && !displayText.isEmpty ? secureCharacter : displayText)
-                .font(.system(size: fontSize, weight: .medium))
-                .foregroundColor(.white)
+                .font(.system(size: fontSize, weight: KKPinviewConstant.normalFontWeight))
+                .foregroundColor(KKPinviewConstant.textColor)
                 .multilineTextAlignment(.center)
                 .frame(width: size, height: size)
                 .opacity(opacity)
@@ -86,7 +85,7 @@ public struct PinDigitField: View {
             TextField("", text: $text)
                 .keyboardType(.numberPad)
                 .multilineTextAlignment(.center)
-                .font(.system(size: Self.normalFontSize, weight: .medium))
+                .font(.system(size: Self.normalFontSize, weight: KKPinviewConstant.normalFontWeight))
                 .foregroundColor(.clear)
                 .frame(width: size, height: size)
                 .disabled(true)

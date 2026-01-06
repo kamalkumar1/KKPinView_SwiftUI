@@ -26,9 +26,3 @@ public enum PinTextFieldType: Sendable {
     }
 }
 
-// MARK: - App Constants
-@available(iOS 15.0, *)
-public struct AppConstants {
-    public static let defaultTextFieldType: PinTextFieldType = .roundCorner
-}
-

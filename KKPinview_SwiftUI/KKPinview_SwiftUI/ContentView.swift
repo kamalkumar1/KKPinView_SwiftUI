@@ -9,8 +9,17 @@ import SwiftUI
 import KKPinView
 
 struct ContentView: View {
+    @State private var code: String = ""
     var body: some View {
-        KKPinViews()
+        KKPinViews(
+            onForgotPin: {
+                print("Forgot PIN")
+            },
+            onSubmit: { code in
+                print("Submitted code: \(code)")
+                self.code = code
+            }
+        )
     }
 }
 

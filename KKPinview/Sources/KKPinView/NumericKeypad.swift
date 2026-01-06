@@ -7,10 +7,9 @@
 
 import SwiftUI
 
-@available(iOS 15.0, *)
-public struct NumericKeypad: View {
-    public let onNumberTap: (String) -> Void
-    public let onDeleteTap: () -> Void
+struct NumericKeypad: View {
+    let onNumberTap: (String) -> Void
+    let onDeleteTap: () -> Void
     
     @State private var pressedButton: String? = nil
     
@@ -20,33 +19,26 @@ public struct NumericKeypad: View {
         ["7", "8", "9"],
         ["", "0", "X"]
     ]
-    public init(
-        onNumberTap: @escaping (String) -> Void,
-        onDeleteTap: @escaping () -> Void
-    ) {
-        self.onNumberTap = onNumberTap
-        self.onDeleteTap = onDeleteTap
-    }
     
-    public var body: some View {
-        VStack(spacing: 16) {
+    var body: some View {
+        VStack(spacing: KKPinviewConstant.keypadSpacing) {
             ForEach(0..<numbers.count, id: \.self) { rowIndex in
-                HStack(spacing: 16) {
-                    ForEach(numbers[rowIndex].indices, id: \.self) { colIndex in
+                HStack(spacing: KKPinviewConstant.keypadSpacing) {
+                    ForEach(0..<numbers[rowIndex].count, id: \.self) { colIndex in
                         let value = numbers[rowIndex][colIndex]
                         
                         if value.isEmpty {
                             // Empty space for layout
                             Spacer()
-                                .frame(width: 70, height: 70)
-                        } else if value == "X" {
+                                .frame(width: KKPinviewConstant.buttonSize, height: KKPinviewConstant.buttonSize)
+                        } else if value == KKPinviewConstant.deleteButtonValue {
                             // Delete button
                             KeypadButton(
                                 value: value,
                                 isPressed: pressedButton == value,
-                                icon: Image(systemName: "delete.backward.fill"),
-                                fontSize: 24,
-                                fontWeight: .medium,
+                                icon: Image(systemName: KKPinviewConstant.deleteButtonIconName),
+                                fontSize: KKPinviewConstant.deleteButtonFontSize,
+                                fontWeight: KKPinviewConstant.deleteButtonFontWeight,
                                 onTap: {
                                     handleButtonPress(value) {
                                         onDeleteTap()
@@ -59,8 +51,8 @@ public struct NumericKeypad: View {
                                 value: value,
                                 isPressed: pressedButton == value,
                                 text: value,
-                                fontSize: 28,
-                                fontWeight: .semibold,
+                                fontSize: KKPinviewConstant.numberButtonFontSize,
+                                fontWeight: KKPinviewConstant.numberButtonFontWeight,
                                 onTap: {
                                     handleButtonPress(value) {
                                         onNumberTap(value)
@@ -72,8 +64,8 @@ public struct NumericKeypad: View {
                 }
             }
         }
-        .padding(.horizontal, 24)
-        .padding(.vertical, 20)
+        .padding(.horizontal, KKPinviewConstant.keypadHorizontalPadding)
+        .padding(.vertical, KKPinviewConstant.keypadVerticalPadding)
     }
     
     private func handleButtonPress(_ value: String, action: @escaping () -> Void) {
@@ -94,36 +86,15 @@ public struct NumericKeypad: View {
     }
 }
 
-@available(iOS 15.0, *)
-public struct KeypadButton: View {
-    public let value: String
-    public let isPressed: Bool
-    public var text: String? = nil
-    public var icon: Image? = nil
-    public let fontSize: CGFloat
-    public let fontWeight: Font.Weight
-    public var buttonType: PinTextFieldType = AppConstants.defaultTextFieldType
-    public let onTap: () -> Void
-    
-    public init(
-        value: String,
-        isPressed: Bool,
-        text: String? = nil,
-        icon: Image? = nil,
-        fontSize: CGFloat,
-        fontWeight: Font.Weight,
-        buttonType: PinTextFieldType = AppConstants.defaultTextFieldType,
-        onTap: @escaping () -> Void
-    ) {
-        self.value = value
-        self.isPressed = isPressed
-        self.text = text
-        self.icon = icon
-        self.fontSize = fontSize
-        self.fontWeight = fontWeight
-        self.buttonType = buttonType
-        self.onTap = onTap
-    }
+struct KeypadButton: View {
+    let value: String
+    let isPressed: Bool
+    var text: String? = nil
+    var icon: Image? = nil
+    let fontSize: CGFloat
+    let fontWeight: Font.Weight
+    var buttonType: PinTextFieldType = KKPinviewConstant.defaultTextFieldType
+    let onTap: () -> Void
     
     // MARK: - Background Shape Based on Type
     @ViewBuilder
@@ -131,22 +102,34 @@ public struct KeypadButton: View {
         switch buttonType {
         case .rectangle:
             Rectangle()
-                .fill(Color.white.opacity(0.2))
-                .frame(width: 70, height: 70)
+                .fill(KKPinviewConstant.fieldBackgroundColor)
+                .overlay(
+                    Rectangle()
+                        .stroke(KKPinviewConstant.fieldStrokeColor, lineWidth: KKPinviewConstant.fieldStrokeWidth)
+                )
+                .frame(width: KKPinviewConstant.buttonSize, height: KKPinviewConstant.buttonSize)
         case .roundCorner:
             // Fully round (Circle)
             Circle()
-                .fill(Color.white.opacity(0.2))
-                .frame(width: 70, height: 70)
+                .fill(KKPinviewConstant.fieldBackgroundColor)
+                .overlay(
+                    Circle()
+                        .stroke(KKPinviewConstant.fieldStrokeColor, lineWidth: KKPinviewConstant.fieldStrokeWidth)
+                )
+                .frame(width: KKPinviewConstant.buttonSize, height: KKPinviewConstant.buttonSize)
         case .withCornerRadius:
             // Rounded rectangle with corner radius
             RoundedRectangle(cornerRadius: buttonType.cornerRadius)
-                .fill(Color.white.opacity(0.2))
-                .frame(width: 70, height: 70)
+                .fill(KKPinviewConstant.fieldBackgroundColor)
+                .overlay(
+                    RoundedRectangle(cornerRadius: buttonType.cornerRadius)
+                        .stroke(KKPinviewConstant.fieldStrokeColor, lineWidth: KKPinviewConstant.fieldStrokeWidth)
+                )
+                .frame(width: KKPinviewConstant.buttonSize, height: KKPinviewConstant.buttonSize)
         }
     }
     
-    public var body: some View {
+    var body: some View {
         Button(action: onTap) {
             Group {
                 if let icon = icon {
@@ -157,8 +140,8 @@ public struct KeypadButton: View {
                         .font(.system(size: fontSize, weight: fontWeight))
                 }
             }
-            .foregroundColor(.white)
-            .frame(width: 70, height: 70)
+            .foregroundColor(KKPinviewConstant.buttonTextColor)
+            .frame(width: KKPinviewConstant.buttonSize, height: KKPinviewConstant.buttonSize)
             .background(backgroundShape)
             .scaleEffect(isPressed ? 0.85 : 1.0)
             .animation(.spring(response: 0.25, dampingFraction: 0.7), value: isPressed)
@@ -169,7 +152,7 @@ public struct KeypadButton: View {
 
 #Preview {
     ZStack {
-        Color.appGradient
+        Color.white
         NumericKeypad(
             onNumberTap: { number in
                 print("Tapped: \(number)")

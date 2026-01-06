@@ -9,10 +9,21 @@ import SwiftUI
 
 @available(iOS 15.0, *)
 public struct KKPinViews: View {
-    public static let totalDigits: Int = 4
+    public var onForgotPin: (() -> Void)? = nil
+    public var onSubmit: ((String) -> Void)? = nil
+    public var showForgotPin: Bool = true
     
-    public init() {}
-    @State private var pinDigits: [String] = Array(repeating: "", count: totalDigits)
+    public init(
+        onForgotPin: (() -> Void)? = nil,
+        onSubmit: ((String) -> Void)? = nil,
+        showForgotPin: Bool = KKPinviewConstant.defaultShowForgotPin
+    ) {
+        self.onForgotPin = onForgotPin
+        self.onSubmit = onSubmit
+        self.showForgotPin = showForgotPin
+    }
+    
+    @State private var pinDigits: [String] = Array(repeating: "", count: KKPinviewConstant.totalDigits)
     @State private var currentFieldIndex: Int = 0
     
     private var currentEmptyFieldIndex: Int {
@@ -21,8 +32,9 @@ public struct KKPinViews: View {
     
     public var body: some View {
         ZStack(alignment: .center) {
-            // Beautiful gradient background with decorative elements
-            PinBackgroundView()
+            // Background color
+            KKPinviewConstant.backgroundColor
+                .ignoresSafeArea()
             
             // Content - Centered on screen
             VStack(alignment: .center, spacing: 0) {
@@ -32,18 +44,30 @@ public struct KKPinViews: View {
                 VStack(alignment: .center, spacing: 40) {
                     // Title section
                     VStack(alignment: .center, spacing: 10) {
-                        Text("Enter \(Self.totalDigits)-Digit Code")
-                            .font(.system(size: 30, weight: .bold))
-                            .foregroundColor(.white)
+                        Text(String(format: KKPinviewConstant.titleTextFormat, KKPinviewConstant.totalDigits))
+                            .font(.system(size: KKPinviewConstant.titleFontSize, weight: KKPinviewConstant.titleFontWeight))
+                            .foregroundColor(KKPinviewConstant.textColor)
                         
-                        Text("Please enter your PIN to continue")
-                            .font(.system(size: 15, weight: .semibold))
-                            .foregroundColor(.white.opacity(0.8))
+                        Text(KKPinviewConstant.subtitleText)
+                            .font(.system(size: KKPinviewConstant.subtitleFontSize, weight: KKPinviewConstant.subtitleFontWeight))
+                            .foregroundColor(KKPinviewConstant.subtitleTextColor)
+                        
+                        // Forgot PIN label
+                        if showForgotPin {
+                            Button(action: {
+                                onForgotPin?()
+                            }) {
+                                Text(KKPinviewConstant.forgotPinText)
+                                    .font(.system(size: KKPinviewConstant.forgotPinFontSize, weight: KKPinviewConstant.forgotPinFontWeight))
+                                    .foregroundColor(KKPinviewConstant.forgotPinTextColor)
+                            }
+                            .padding(.top, 8)
+                        }
                     }
                     
                     // PIN input fields - Centered and equally distributed
-                    HStack(spacing: 12) {
-                        ForEach(0..<Self.totalDigits, id: \.self) { index in
+                    HStack(spacing: KKPinviewConstant.fieldSpacing) {
+                        ForEach(0..<KKPinviewConstant.totalDigits, id: \.self) { index in
                             PinDigitField(
                                 text: $pinDigits[index],
                                 isFocused: currentFieldIndex == index,
@@ -81,8 +105,12 @@ public struct KKPinViews: View {
         if let emptyIndex = pinDigits.firstIndex(where: { $0.isEmpty }) {
             pinDigits[emptyIndex] = number
             // Move to next field if not the last one
-            if emptyIndex < Self.totalDigits - 1 {
+            if emptyIndex < KKPinviewConstant.totalDigits - 1 {
                 currentFieldIndex = emptyIndex + 1
+            } else {
+                // All fields filled, submit the PIN
+                let pinCode = pinDigits.joined()
+                onSubmit?(pinCode)
             }
         }
     }
