@@ -145,15 +145,23 @@ public struct KKPinViews: View {
             withAnimation(.easeInOut(duration: 0.3)) {
                 errorMessage = nil
             }
-            clearPINFields()
-            onSubmit?(true)
+            DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
+                clearPINFields()
+                onSubmit?(true)
+            }
+           
         } else {
             // PIN is invalid - show error message, clear fields and notify failure
             withAnimation(.easeInOut(duration: 0.3)) {
                 errorMessage = KKPinviewConstant.invalidPinErrorText
+               
             }
-            clearPINFields()
-            onSubmit?(false)
+            DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
+                clearPINFields()
+                onSubmit?(false)
+            }
+           
+           
         }
     }
     
