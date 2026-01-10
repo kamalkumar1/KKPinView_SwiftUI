@@ -12,7 +12,7 @@ import Foundation
 /// `KKPinStorage` provides a simple interface for managing encrypted PIN storage:
 /// - **Automatic Encryption**: PINs are automatically encrypted before storage
 /// - **Secure Key Management**: Uses `KKSecureKeyGenerator` for key management
-/// - **UserDefaults Storage**: Stores encrypted PINs in UserDefaults
+/// - **File Protection**: Stores encrypted PINs as files with NSFileProtectionComplete
 /// - **PIN Verification**: Includes methods for verifying PINs
 ///
 /// ## Usage Example
@@ -49,37 +49,45 @@ import Foundation
 /// 1. PIN string is converted to UTF-8 data
 /// 2. Secure key is obtained from `KKSecureKeyGenerator`
 /// 3. PIN data is encrypted using `KKEncryptionHelper` (AES-256-GCM)
-/// 4. Encrypted data is base64-encoded and stored in UserDefaults
+/// 4. Encrypted data is stored as a file with NSFileProtectionComplete protection
 ///
 /// ### Retrieval Flow:
-/// 1. Encrypted base64 string is retrieved from UserDefaults
-/// 2. Base64 string is decoded to encrypted data
-/// 3. Secure key is obtained from `KKSecureKeyGenerator`
-/// 4. Data is decrypted using `KKEncryptionHelper`
-/// 5. Decrypted data is converted back to PIN string
+/// 1. Encrypted data is read from protected file
+/// 2. Secure key is obtained from `KKSecureKeyGenerator`
+/// 3. Data is decrypted using `KKEncryptionHelper`
+/// 4. Decrypted data is converted back to PIN string
 ///
 /// ## Important Notes
-/// - PINs are stored **encrypted** in UserDefaults
+/// - PINs are stored **encrypted** as files in Application Support directory
+/// - Files use **NSFileProtectionComplete** (accessible only when device is unlocked)
 /// - The encryption key is **device-specific** and **persistent**
 /// - PINs encrypted on one device **cannot** be decrypted on another device
 /// - If the secure key is reset, all stored PINs become unrecoverable
-/// - For production apps, consider using Keychain Services instead of UserDefaults
+/// - File protection ensures data is encrypted at rest and only accessible when device is unlocked
 ///
-/// ## Storage Key
-/// PINs are stored in UserDefaults under the key: `"kkpinview_encrypted_pin"`
+/// ## Storage Location
+/// PINs are stored as files in Application Support directory: `encrypted_pin.dat`
 ///
 /// - Note: Available on iOS 15.0 and later
 @available(iOS 15.0, *)
 public enum KKPinStorage {
-    private static let pinPreferenceKey = "kkpinview_encrypted_pin"
+    private static let fileName = "encrypted_pin.dat"
     
-    /// Saves PIN securely to UserDefaults using encryption.
+    /// Gets the file URL for storing the encrypted PIN with file protection
+    private static var pinFileURL: URL? {
+        guard let appSupportURL = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask).first else {
+            return nil
+        }
+        return appSupportURL.appendingPathComponent(fileName)
+    }
+    
+    /// Saves PIN securely to file using encryption and NSFileProtectionComplete.
     ///
     /// This method:
     /// 1. Validates that the PIN is not empty
     /// 2. Gets or creates a secure key
     /// 3. Encrypts the PIN using AES-256-GCM
-    /// 4. Stores the encrypted PIN in UserDefaults as a base64 string
+    /// 4. Stores the encrypted PIN as a file with NSFileProtectionComplete protection
     ///
     /// - Parameter pin: The PIN string to save (typically 4-6 digits)
     /// - Returns: `true` if saved successfully, `false` otherwise
@@ -117,26 +125,63 @@ public enum KKPinStorage {
             return false
         }
         
-        // Save encrypted data to UserDefaults as base64 string
-        let encryptedString = encryptedData.base64EncodedString()
-        UserDefaults.standard.set(encryptedString, forKey: pinPreferenceKey)
-        UserDefaults.standard.synchronize()
+        // Get file URL
+        guard let fileURL = pinFileURL else {
+            print("❌ savePIN: Failed to get file URL")
+            return false
+        }
         
-        print("✅ PIN saved successfully")
+        // Ensure Application Support directory exists
+        let fileManager = FileManager.default
+        let directoryURL = fileURL.deletingLastPathComponent()
+        do {
+            try fileManager.createDirectory(at: directoryURL, withIntermediateDirectories: true, attributes: nil)
+        } catch {
+            print("❌ savePIN: Failed to create directory: \(error.localizedDescription)")
+            return false
+        }
+        
+        // Delete existing file if present
+        if fileManager.fileExists(atPath: fileURL.path) {
+            do {
+                try fileManager.removeItem(at: fileURL)
+            } catch {
+                print("⚠️  savePIN: Failed to remove existing file: \(error.localizedDescription)")
+            }
+        }
+        
+        // Write encrypted data to file with NSFileProtectionComplete
+        // Create file with protection attributes
+        let attributes: [FileAttributeKey: Any] = [
+            .protectionKey: FileProtectionType.complete
+        ]
+        
+        let success = fileManager.createFile(
+            atPath: fileURL.path,
+            contents: encryptedData,
+            attributes: attributes
+        )
+        
+        guard success else {
+            print("❌ savePIN: Failed to create file")
+            return false
+        }
+        
+        print("✅ PIN saved successfully with NSFileProtectionComplete")
         return true
     }
     
-    /// Loads and decrypts PIN from UserDefaults.
+    /// Loads and decrypts PIN from protected file.
     ///
     /// This method:
-    /// 1. Retrieves the encrypted PIN from UserDefaults
+    /// 1. Retrieves the encrypted PIN from protected file
     /// 2. Gets the secure key
-    /// 3. Decodes the base64 string
-    /// 4. Decrypts the PIN data
-    /// 5. Converts back to string
+    /// 3. Decrypts the PIN data
+    /// 4. Converts back to string
     ///
     /// - Returns: Decrypted PIN string, or `nil` if:
     ///   - No PIN is stored
+    ///   - Device is locked (File protection prevents access)
     ///   - Decryption fails (wrong key, corrupted data, etc.)
     ///
     /// ## Example
@@ -148,20 +193,39 @@ public enum KKPinStorage {
     /// }
     /// ```
     public static func loadPIN() -> String? {
-        // Check if PIN exists
-        guard let encryptedString = UserDefaults.standard.string(forKey: pinPreferenceKey) else {
-            print("ℹ️  No PIN found in UserDefaults")
+        // Get file URL
+        guard let fileURL = pinFileURL else {
+            print("❌ loadPIN: Failed to get file URL")
+            return nil
+        }
+        
+        // Check if file exists
+        let fileManager = FileManager.default
+        guard fileManager.fileExists(atPath: fileURL.path) else {
+            print("ℹ️  No PIN file found")
+            return nil
+        }
+        
+        // Read encrypted data from file
+        let encryptedData: Data
+        do {
+            encryptedData = try Data(contentsOf: fileURL)
+        } catch {
+            // Check if error is due to file protection (device locked)
+            if let nsError = error as NSError? {
+                if nsError.code == 257 || nsError.code == 260 {
+                    print("⚠️  loadPIN: File is protected (device may be locked): \(error.localizedDescription)")
+                } else {
+                    print("❌ loadPIN: File read failed: \(error.localizedDescription)")
+                }
+            } else {
+                print("❌ loadPIN: File read failed: \(error.localizedDescription)")
+            }
             return nil
         }
         
         // Get secure key
         let secureKey = KKSecureKeyGenerator.getOrCreateSecureKey()
-        
-        // Decode base64
-        guard let encryptedData = Data(base64Encoded: encryptedString) else {
-            print("❌ loadPIN: Failed to decode base64")
-            return nil
-        }
         
         // Decrypt
         guard let decryptedData = KKEncryptionHelper.decryptData(encryptedData, secureKey: secureKey) else {
@@ -175,7 +239,7 @@ public enum KKPinStorage {
             return nil
         }
         
-        print("✅ PIN loaded successfully")
+        print("✅ PIN loaded successfully from protected file")
         return pin
     }
     
@@ -211,9 +275,9 @@ public enum KKPinStorage {
         return storedPIN == pin
     }
     
-    /// Removes the stored PIN from UserDefaults.
+    /// Removes the stored PIN file.
     ///
-    /// This method permanently deletes the encrypted PIN from storage.
+    /// This method permanently deletes the encrypted PIN file from storage.
     /// After calling this method, `hasStoredPIN()` will return `false`.
     ///
     /// ## Example
@@ -223,20 +287,34 @@ public enum KKPinStorage {
     /// print("PIN cleared")
     /// ```
     ///
-    /// - Note: This only removes the PIN, not the secure key.
+    /// - Note: This only removes the PIN file, not the secure key.
     ///   To reset the secure key, use `KKSecureKeyGenerator.resetKey()`
     public static func deletePIN() {
-        UserDefaults.standard.removeObject(forKey: pinPreferenceKey)
-        UserDefaults.standard.synchronize()
-        print("🗑️  PIN deleted from UserDefaults")
+        guard let fileURL = pinFileURL else {
+            print("⚠️  Failed to get file URL for deletion")
+            return
+        }
+        
+        let fileManager = FileManager.default
+        do {
+            try fileManager.removeItem(at: fileURL)
+            print("🗑️  PIN file deleted successfully")
+        } catch {
+            if let nsError = error as NSError?, nsError.code == 260 {
+                // File doesn't exist, which is fine
+                print("ℹ️  PIN file does not exist")
+            } else {
+                print("⚠️  Failed to delete PIN file: \(error.localizedDescription)")
+            }
+        }
     }
     
-    /// Checks if a PIN is stored in UserDefaults.
+    /// Checks if a PIN file exists.
     ///
-    /// This method only checks for the presence of stored data, not whether
-    /// it can be successfully decrypted.
+    /// This method only checks for the presence of the PIN file, not whether
+    /// it can be successfully decrypted or if the device is unlocked.
     ///
-    /// - Returns: `true` if a PIN is stored, `false` otherwise
+    /// - Returns: `true` if a PIN file exists, `false` otherwise
     ///
     /// ## Example
     /// ```swift
@@ -247,7 +325,10 @@ public enum KKPinStorage {
     /// }
     /// ```
     public static func hasStoredPIN() -> Bool {
-        return UserDefaults.standard.string(forKey: pinPreferenceKey) != nil
+        guard let fileURL = pinFileURL else {
+            return false
+        }
+        return FileManager.default.fileExists(atPath: fileURL.path)
     }
 }
 

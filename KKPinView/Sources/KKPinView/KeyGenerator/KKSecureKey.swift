@@ -103,7 +103,11 @@ extension KKSecureKey: ExpressibleByStringLiteral {
     /// - Parameter value: A base64 encoded string
     /// - Note: If the string is invalid, an empty key is created
     public init(stringLiteral value: String) {
-        self.init(base64String: value) ?? KKSecureKey(keyBytes: [])
+        if let key = KKSecureKey(base64String: value) {
+            self = key
+        } else {
+            self = KKSecureKey(keyBytes: [])
+        }
     }
 }
 

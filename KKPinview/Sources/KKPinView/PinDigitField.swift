@@ -7,7 +7,8 @@
 
 import SwiftUI
 
-struct PinDigitField: View {
+@available(iOS 15.0, *)
+public struct PinDigitField: View {
     @Binding var text: String
     let isFocused: Bool
     var fieldSize: CGFloat?
@@ -64,7 +65,7 @@ struct PinDigitField: View {
         }
     }
     
-    var body: some View {
+    public var body: some View {
         ZStack {
             // Background - Shape based on fieldType
             backgroundShape

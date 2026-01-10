@@ -7,8 +7,7 @@
 
 import Foundation
 import CryptoKit
-
-#if os(iOS)
+#if canImport(UIKit)
 import UIKit
 #endif
 
@@ -60,7 +59,7 @@ import UIKit
 /// - For production apps, consider using Keychain Services instead of UserDefaults
 /// - The key generation is deterministic for the same device and app
 ///
-/// - Note: Available on iOS 15.0 and later
+/// - Note: Available on iOS 15.0 and later (includes iPadOS)
 @available(iOS 15.0, *)
 public enum KKSecureKeyGenerator {
     private static let secureKeyPreferenceKey = "kkpinview_secure_key"
@@ -119,8 +118,8 @@ public enum KKSecureKeyGenerator {
         }
         
         // Generate and save new key
-        let newKey = generateSecureKey()
-        let keyValue = newKey.value
+        let newKey: KKSecureKey = generateSecureKey()
+        let keyValue: String = newKey.value
         userDefaults.set(keyValue, forKey: secureKeyPreferenceKey)
         userDefaults.synchronize()
         
@@ -145,38 +144,17 @@ public enum KKSecureKeyGenerator {
     
     // MARK: - Private Helpers
     
-    /// Gets device fingerprint (UIDevice identifier on iOS).
+    /// Gets device fingerprint (UIDevice identifier on iOS/iPadOS).
     ///
     /// - Returns: Device identifier string, or fallback string if unavailable
     private static func getDeviceFingerprint() -> String {
-        #if os(iOS)
+        #if canImport(UIKit)
         if let identifier = UIDevice.current.identifierForVendor?.uuidString {
             return identifier
         }
-        return "ios-fallback"
-        #elseif os(macOS)
-        // For macOS, use system UUID or fallback
-        if let serialNumber = getMacSerialNumber() {
-            return serialNumber
-        }
-        return "macos-fallback"
-        #else
-        return "unknown-platform"
         #endif
+        return "ios-fallback"
     }
-    
-    #if os(macOS)
-    /// Gets macOS serial number for device fingerprinting.
-    private static func getMacSerialNumber() -> String? {
-        let platformExpert = IOServiceGetMatchingService(kIOMasterPortDefault, IOServiceMatching("IOPlatformExpertDevice"))
-        defer { IOObjectRelease(platformExpert) }
-        
-        guard let serialNumber = IORegistryEntryCreateCFProperty(platformExpert, kIOPlatformSerialNumberKey as CFString, kCFAllocatorDefault, 0)?.takeRetainedValue() as? String else {
-            return nil
-        }
-        return serialNumber
-    }
-    #endif
     
     /// Generates app-specific salt using entropy, app path, and device ID.
     ///
@@ -194,7 +172,7 @@ public enum KKSecureKeyGenerator {
         let result = entropy.withUnsafeMutableBytes { bytes in
             SecRandomCopyBytes(kSecRandomDefault, 32, bytes.baseAddress!)
         }
-        guard result == errSecSuccess else {
+        if result != errSecSuccess {
             // Fallback to less secure random
             entropy = Data((0..<32).map { _ in UInt8.random(in: 0...255) })
         }
@@ -263,7 +241,7 @@ public enum KKSecureKeyGenerator {
             for _ in 1..<iterations {
                 u = Data(HMAC<SHA256>.authenticationCode(for: u, using: hmacKey))
                 // XOR with previous result
-                t = zip(t, u).map { $0 ^ $1 }
+                t = Data(zip(t, u).map { $0 ^ $1 })
             }
             
             result.append(t)

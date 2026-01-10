@@ -62,7 +62,7 @@ import CryptoKit
 /// - Logs detailed error messages to console
 /// - Validates input parameters before processing
 ///
-/// - Note: Available on iOS 15.0 and later
+/// - Note: Available on iOS 15.0 and later (includes iPadOS)
 @available(iOS 15.0, *)
 public enum KKEncryptionHelper {
     
@@ -191,20 +191,19 @@ public enum KKEncryptionHelper {
             }
             
             let nonceData = encryptedData.prefix(12)
-            let tagData = encryptedData.suffix(16)
+            let tagData = Data(encryptedData.suffix(16))
             let ciphertextData = encryptedData.dropFirst(12).dropLast(16)
             
-            guard let nonce = try? AES.GCM.Nonce(data: nonceData),
-                  let tag = try? AES.GCM.SealedBox.Tag(tagData) else {
-                print("❌ DecryptData: Failed to extract nonce or tag")
+            guard let nonce = try? AES.GCM.Nonce(data: nonceData) else {
+                print("❌ DecryptData: Failed to extract nonce")
                 return nil
             }
             
-            // Create sealed box
+            // Create sealed box with nonce, ciphertext, and tag
             let sealedBox = try AES.GCM.SealedBox(
                 nonce: nonce,
                 ciphertext: ciphertextData,
-                tag: tag
+                tag: tagData
             )
             
             // Create symmetric key
@@ -220,4 +219,3 @@ public enum KKEncryptionHelper {
         }
     }
 }
-
