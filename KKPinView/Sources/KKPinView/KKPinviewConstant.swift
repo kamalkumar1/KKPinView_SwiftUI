@@ -49,6 +49,10 @@ public struct KKPinviewConstant {
     public static let keypadHorizontalPadding: CGFloat = 24
     public static let keypadVerticalPadding: CGFloat = 20
     
+    // MARK: - PIN Validation Limits
+    public static let maxPinAttempts: Int = 5
+    public static let pinLockoutDurationMinutes: Int = 10
+    
     // MARK: - Font Weights
     public static let titleFontWeight: Font.Weight = .bold
     public static let subtitleFontWeight: Font.Weight = .semibold
@@ -65,6 +69,8 @@ public struct KKPinviewConstant {
     public static let subtitleText: String = "Please enter your PIN to continue"
     public static let forgotPinText: String = "Forgot PIN?"
     public static let invalidPinErrorText: String = "Invalid PIN. Please try again."
+    public static let maxAttemptsReachedErrorTextFormat: String = "Maximum attempts reached. Please try again after %d minutes."
+    public static let lockoutErrorTextFormat: String = "Too many failed attempts. Please try again after %d minutes."
     public static let secureCharacter: String = "●"
     public static let deleteButtonValue: String = "X"
     public static let deleteButtonIconName: String = "delete.backward.fill"

@@ -26,6 +26,10 @@ public struct KKPinViews: View {
     @State private var pinDigits: [String] = Array(repeating: "", count: KKPinviewConstant.totalDigits)
     @State private var currentFieldIndex: Int = 0
     @State private var errorMessage: String? = nil
+    @State private var isLockedOut: Bool = false
+    
+    // Lockout manager instance
+    private let lockoutManager = KKPinLockoutManager()
     
     private var currentEmptyFieldIndex: Int {
         pinDigits.firstIndex(where: { $0.isEmpty }) ?? 0
@@ -77,6 +81,8 @@ public struct KKPinViews: View {
                         }
                     }
                     .frame(maxWidth: .infinity)
+                    .disabled(isLockedOut)
+                    .opacity(isLockedOut ? 0.5 : 1.0)
                     
                     // Error message
                     if let errorMessage = errorMessage {
@@ -98,6 +104,8 @@ public struct KKPinViews: View {
                             handleDeleteTap()
                         }
                     )
+                    .disabled(isLockedOut)
+                    .opacity(isLockedOut ? 0.5 : 1.0)
                 }
                 .frame(maxWidth: .infinity)
                 .padding(.horizontal, 24)
@@ -109,13 +117,21 @@ public struct KKPinViews: View {
             // Set initial focus
             currentFieldIndex = 0
             errorMessage = nil
+            updateLockoutStatus()
         }
     }
     
     // MARK: - Helper Methods
     private func handleNumberTap(_ number: String) {
+        // Check if locked out
+        updateLockoutStatus()
+        if isLockedOut {
+            updateErrorMessage()
+            return
+        }
+        
         // Clear error message when user starts entering new PIN
-        if errorMessage != nil {
+        if errorMessage != nil && !errorMessage!.contains("minutes") {
             withAnimation(.easeInOut(duration: 0.3)) {
                 errorMessage = nil
             }
@@ -135,10 +151,20 @@ public struct KKPinViews: View {
     }
     
     private func validateAndSubmitPIN() {
+        // Check lockout status before validation
+        updateLockoutStatus()
+        guard !isLockedOut else {
+            updateErrorMessage()
+            return
+        }
+        
         let pinCode = pinDigits.joined()
         
-        // Verify PIN using KKPinStorage
-        let isValid = KKPinStorage.verifyPIN(pinCode)
+        // Validate PIN using lockout manager (handles attempt tracking and lockout)
+        let isValid = lockoutManager.validatePIN(pinCode)
+        
+        // Update lockout status after validation
+        updateLockoutStatus()
         
         if isValid {
             // PIN is valid - clear error, clear fields and notify success
@@ -149,19 +175,38 @@ public struct KKPinViews: View {
                 clearPINFields()
                 onSubmit?(true)
             }
-           
         } else {
-            // PIN is invalid - show error message, clear fields and notify failure
-            withAnimation(.easeInOut(duration: 0.3)) {
-                errorMessage = KKPinviewConstant.invalidPinErrorText
-               
+            // PIN is invalid - update error message based on lockout status
+            DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
+                withAnimation(.easeInOut(duration: 0.3)) {
+                    updateErrorMessage()
+                }
             }
-            DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
+            
+            // Call success callback after a brief delay
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
                 clearPINFields()
                 onSubmit?(false)
             }
-           
-           
+            
+        }
+    }
+    
+    // MARK: - Lockout Management
+    private func updateLockoutStatus() {
+        lockoutManager.checkLockoutStatus()
+        isLockedOut = lockoutManager.isLockedOut
+    }
+    
+    private func updateErrorMessage() {
+        if let message = lockoutManager.getErrorMessage() {
+            withAnimation(.easeInOut(duration: 0.3)) {
+                errorMessage = message
+            }
+        } else {
+            withAnimation(.easeInOut(duration: 0.3)) {
+                errorMessage = nil
+            }
         }
     }
     
@@ -174,8 +219,15 @@ public struct KKPinViews: View {
     }
     
     private func handleDeleteTap() {
-        // Clear error message when user deletes digits
-        if errorMessage != nil {
+        // Check if locked out
+        updateLockoutStatus()
+        if isLockedOut {
+            updateErrorMessage()
+            return
+        }
+        
+        // Clear error message when user deletes digits (but not lockout messages)
+        if errorMessage != nil && !errorMessage!.contains("minutes") {
             withAnimation(.easeInOut(duration: 0.3)) {
                 errorMessage = nil
             }
@@ -193,3 +245,4 @@ public struct KKPinViews: View {
 #Preview {
     KKPinViews()
 }
+

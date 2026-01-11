@@ -205,7 +205,12 @@ public struct KKPINSetUPView: View {
         let confirmPin = confirmPinDigits.joined()
         
         if enteredPin == confirmPin {
-            // PINs match - Save and show success
+            // PINs match - Remove previous PIN and clear lockout manager before saving
+            KKPinStorage.deletePIN()
+            let lockoutManager = KKPinLockoutManager()
+            lockoutManager.resetLockout()
+            
+            // Save and show success
             let saved = KKPinStorage.savePIN(enteredPin)
             if saved {
                 withAnimation(.easeInOut(duration: 0.3)) {
@@ -216,9 +221,6 @@ public struct KKPINSetUPView: View {
                 
                 // Call success callback after a brief delay
                 DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
-                    if(!KKPinStorage.hasStoredPIN()){
-                        KKPinStorage.savePIN(enteredPin)
-                    }
                     onSetupComplete?(enteredPin)
                 }
             } else {
