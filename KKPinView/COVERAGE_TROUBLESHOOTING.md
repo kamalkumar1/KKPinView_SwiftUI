@@ -25,27 +25,13 @@ If your test file (`KKEncryptionHelperTests.swift`) is not showing up in code co
 
 ## Solution 2: Verify Coverage is Enabled
 
-**For Swift Package Manager projects:**
+1. **Check Scheme Settings:**
+   - In Xcode: `Product` → `Scheme` → `Edit Scheme...`
+   - Select `Test` from left sidebar
+   - Ensure `Gather coverage for:` is checked
+   - Select `All targets` or specific targets
 
-The "Gather coverage for:" option may NOT appear in scheme settings - this is normal for SPM projects.
-
-**Instead, use one of these methods:**
-
-1. **Enable via Command Line:**
-   ```bash
-   cd KKPinView
-   swift test --enable-code-coverage
-   ```
-
-2. **Or Coverage Works Automatically:**
-   - For SPM projects, coverage is often collected automatically
-   - Just run tests: `Cmd + U`
-   - Check Report Navigator: `Cmd + 9` → Coverage tab
-
-**If using regular Xcode project (not SPM):**
-- `Product` → `Scheme` → `Edit Scheme...`
-- Select `Test` from left sidebar
-- Look for coverage options (may vary by Xcode version)
+2. **Re-run Tests** after enabling coverage
 
 ## Solution 3: Verify Test File is Included
 
