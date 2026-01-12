@@ -118,6 +118,7 @@ public struct KKPinViews: View {
             currentFieldIndex = 0
             errorMessage = nil
             updateLockoutStatus()
+            updateErrorMessage()
         }
     }
     
