@@ -18,15 +18,28 @@
 
 ### Step 2: Enable Code Coverage
 
-1. In Xcode, go to the menu bar
-2. Click `Product` → `Scheme` → `Edit Scheme...`
-   - Or use keyboard shortcut: `Cmd + <` (Cmd + Shift + ,)
-3. In the scheme editor dialog:
-   - Select **`Test`** from the left sidebar (under "Run", "Test", "Profile", etc.)
-   - In the right panel, find the **`Options`** tab
-   - Check the box **`Gather coverage for:`**
-   - Select **`All targets`** from the dropdown (or select specific targets if needed)
-4. Click **`Close`** to save
+**For Swift Package Manager projects:**
+
+Code coverage for SPM projects works differently. You have two options:
+
+**Option A: Enable via Command Line (Recommended for SPM)**
+1. Open Terminal
+2. Navigate to package directory:
+   ```bash
+   cd /Users/kamal/Documents/GitHub/KKPinView_SwiftUI/KKPinView
+   ```
+3. Run tests with coverage enabled:
+   ```bash
+   swift test --enable-code-coverage
+   ```
+4. Coverage data will be available in Xcode's Report Navigator
+
+**Option B: Coverage Works Automatically in Xcode**
+For Swift Package Manager projects opened in Xcode, coverage is often collected automatically when you run tests. Simply:
+1. Run tests in Xcode: `Cmd + U`
+2. View coverage: `Cmd + 9` → Select test run → `Coverage` tab
+
+**Note:** The "Gather coverage for:" option may not appear in scheme settings for SPM projects - this is normal. Coverage still works automatically or via command line.
 
 ### Step 3: Run Tests
 
