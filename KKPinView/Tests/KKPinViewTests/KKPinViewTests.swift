@@ -1,6 +1,8 @@
 import XCTest
 @testable import KKPinView
 
+@available(iOS 15.0, *)
+@MainActor
 final class KKPinViewTests: XCTestCase {
     func testExample() throws {
         // XCTest Documentation
