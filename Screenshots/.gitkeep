@@ -1,0 +1,10 @@
+# Screenshots Directory
+
+Add your screenshot images here:
+- `pin-entry.png` - PIN entry view
+- `pin-setup.png` - PIN setup view  
+- `pin-error.png` - Error state
+- `pin-lockout.png` - Lockout state
+
+See `SCREENSHOTS_GUIDE.md` for detailed instructions.
+
