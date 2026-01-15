@@ -50,8 +50,8 @@ public struct KKPinviewConstant {
     public static let keypadVerticalPadding: CGFloat = 20
     
     // MARK: - PIN Validation Limits
-    public static let maxPinAttempts: Int = 2
-    public static let pinLockoutDurationMinutes: Int = 2
+    public static let maxPinAttempts: Int = 5
+    public static let pinLockoutDurationMinutes: Int = 5
     
     // MARK: - Font Weights
     public static let titleFontWeight: Font.Weight = .bold

@@ -119,6 +119,7 @@ public struct KKPinViews: View {
             errorMessage = nil
             updateLockoutStatus()
             updateErrorMessage()
+           // getLogOutErrorMessagePinError()
         }
     }
     
@@ -172,20 +173,20 @@ public struct KKPinViews: View {
             withAnimation(.easeInOut(duration: 0.3)) {
                 errorMessage = nil
             }
-            DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
                 clearPINFields()
                 onSubmit?(true)
             }
         } else {
             // PIN is invalid - update error message based on lockout status
-            DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.7) {
                 withAnimation(.easeInOut(duration: 0.3)) {
-                    updateErrorMessage()
+                    updatePinErrorMessage()
                 }
             }
             
             // Call success callback after a brief delay
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
                 clearPINFields()
                 onSubmit?(false)
             }
@@ -198,9 +199,20 @@ public struct KKPinViews: View {
         lockoutManager.checkLockoutStatus()
         isLockedOut = lockoutManager.isLockedOut
     }
+    private func updatePinErrorMessage() {
+        if let message = lockoutManager.getErrorMessage() {
+            withAnimation(.easeInOut(duration: 0.3)) {
+                errorMessage = message
+            }
+        } else {
+            withAnimation(.easeInOut(duration: 0.3)) {
+                errorMessage = nil
+            }
+        }
+    }
     
     private func updateErrorMessage() {
-        if let message = lockoutManager.getErrorMessage() {
+        if let message = lockoutManager.getLocKOutErrorMessagePinError() {
             withAnimation(.easeInOut(duration: 0.3)) {
                 errorMessage = message
             }

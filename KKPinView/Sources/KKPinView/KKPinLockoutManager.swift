@@ -236,5 +236,18 @@ public class KKPinLockoutManager {
         
         return nil
     }
+    public func getLocKOutErrorMessagePinError() -> String? {
+        checkLockoutStatus()
+        
+        if isLockedOut {
+            let remaining = remainingLockoutMinutes
+            if remaining > 0 {
+                return String(format: KKPinviewConstant.lockoutErrorTextFormat, remaining)
+            }
+            return String(format: KKPinviewConstant.maxAttemptsReachedErrorTextFormat, lockoutDurationMinutes)
+        }
+        return nil
+    }
+        
 }
 
