@@ -3,6 +3,7 @@
 A secure, customizable PIN entry and setup view for iOS and iPadOS built with SwiftUI. Features encrypted PIN storage, lockout protection, and a beautiful, modern UI.
 
 [![Swift](https://img.shields.io/badge/Swift-6.2-orange.svg)](https://swift.org)
+[![SwiftUI](https://img.shields.io/badge/SwiftUI-5.0-blue.svg)](https://developer.apple.com/xcode/swiftui/)
 [![Platform](https://img.shields.io/badge/Platform-iOS%2015.0%2B-blue.svg)](https://developer.apple.com/ios/)
 [![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 
