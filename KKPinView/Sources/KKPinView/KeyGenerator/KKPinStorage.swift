@@ -106,7 +106,7 @@ public enum KKPinStorage {
     @discardableResult
     public static func savePIN(_ pin: String) -> Bool {
         guard !pin.isEmpty else {
-            print("❌ savePIN: PIN cannot be empty")
+            debugPrint("❌ savePIN: PIN cannot be empty")
             return false
         }
         
@@ -115,19 +115,19 @@ public enum KKPinStorage {
         
         // Convert PIN to data
         guard let pinData = pin.data(using: .utf8) else {
-            print("❌ savePIN: Failed to convert PIN to data")
+            debugPrint("❌ savePIN: Failed to convert PIN to data")
             return false
         }
         
         // Encrypt PIN
         guard let encryptedData = KKEncryptionHelper.encryptData(pinData, secureKey: secureKey) else {
-            print("❌ savePIN: Encryption failed")
+            debugPrint("❌ savePIN: Encryption failed")
             return false
         }
         
         // Get file URL
         guard let fileURL = pinFileURL else {
-            print("❌ savePIN: Failed to get file URL")
+            debugPrint("❌ savePIN: Failed to get file URL")
             return false
         }
         
@@ -137,7 +137,7 @@ public enum KKPinStorage {
         do {
             try fileManager.createDirectory(at: directoryURL, withIntermediateDirectories: true, attributes: nil)
         } catch {
-            print("❌ savePIN: Failed to create directory: \(error.localizedDescription)")
+            debugPrint("❌ savePIN: Failed to create directory: \(error.localizedDescription)")
             return false
         }
         
@@ -146,7 +146,7 @@ public enum KKPinStorage {
             do {
                 try fileManager.removeItem(at: fileURL)
             } catch {
-                print("⚠️  savePIN: Failed to remove existing file: \(error.localizedDescription)")
+                debugPrint("⚠️  savePIN: Failed to remove existing file: \(error.localizedDescription)")
             }
         }
         
@@ -163,11 +163,11 @@ public enum KKPinStorage {
         )
         
         guard success else {
-            print("❌ savePIN: Failed to create file")
+            debugPrint("❌ savePIN: Failed to create file")
             return false
         }
         
-        print("✅ PIN saved successfully with NSFileProtectionComplete")
+        debugPrint("✅ PIN saved successfully with NSFileProtectionComplete")
         return true
     }
     
@@ -195,14 +195,14 @@ public enum KKPinStorage {
     public static func loadPIN() -> String? {
         // Get file URL
         guard let fileURL = pinFileURL else {
-            print("❌ loadPIN: Failed to get file URL")
+            debugPrint("❌ loadPIN: Failed to get file URL")
             return nil
         }
         
         // Check if file exists
         let fileManager = FileManager.default
         guard fileManager.fileExists(atPath: fileURL.path) else {
-            print("ℹ️  No PIN file found")
+            debugPrint("ℹ️  No PIN file found")
             return nil
         }
         
@@ -214,12 +214,12 @@ public enum KKPinStorage {
             // Check if error is due to file protection (device locked)
             if let nsError = error as NSError? {
                 if nsError.code == 257 || nsError.code == 260 {
-                    print("⚠️  loadPIN: File is protected (device may be locked): \(error.localizedDescription)")
+                    debugPrint("⚠️  loadPIN: File is protected (device may be locked): \(error.localizedDescription)")
                 } else {
-                    print("❌ loadPIN: File read failed: \(error.localizedDescription)")
+                    debugPrint("❌ loadPIN: File read failed: \(error.localizedDescription)")
                 }
             } else {
-                print("❌ loadPIN: File read failed: \(error.localizedDescription)")
+                debugPrint("❌ loadPIN: File read failed: \(error.localizedDescription)")
             }
             return nil
         }
@@ -229,17 +229,17 @@ public enum KKPinStorage {
         
         // Decrypt
         guard let decryptedData = KKEncryptionHelper.decryptData(encryptedData, secureKey: secureKey) else {
-            print("❌ loadPIN: Decryption failed")
+            debugPrint("❌ loadPIN: Decryption failed")
             return nil
         }
         
         // Convert back to string
         guard let pin = String(data: decryptedData, encoding: .utf8) else {
-            print("❌ loadPIN: Failed to convert data to string")
+            debugPrint("❌ loadPIN: Failed to convert data to string")
             return nil
         }
         
-        print("✅ PIN loaded successfully from protected file")
+        debugPrint("✅ PIN loaded successfully from protected file")
         return pin
     }
     
@@ -291,20 +291,20 @@ public enum KKPinStorage {
     ///   To reset the secure key, use `KKSecureKeyGenerator.resetKey()`
     public static func deletePIN() {
         guard let fileURL = pinFileURL else {
-            print("⚠️  Failed to get file URL for deletion")
+            debugPrint("⚠️  Failed to get file URL for deletion")
             return
         }
         
         let fileManager = FileManager.default
         do {
             try fileManager.removeItem(at: fileURL)
-            print("🗑️  PIN file deleted successfully")
+            debugPrint("🗑️  PIN file deleted successfully")
         } catch {
             if let nsError = error as NSError?, nsError.code == 260 {
                 // File doesn't exist, which is fine
-                print("ℹ️  PIN file does not exist")
+                debugPrint("ℹ️  PIN file does not exist")
             } else {
-                print("⚠️  Failed to delete PIN file: \(error.localizedDescription)")
+                debugPrint("⚠️  Failed to delete PIN file: \(error.localizedDescription)")
             }
         }
     }

@@ -113,7 +113,7 @@ public enum KKSecureKeyGenerator {
         
         // Try to load existing key
         if let existingKey = userDefaults.string(forKey: secureKeyPreferenceKey) {
-            print("🔑 Loaded key from UserDefaults")
+            debugPrint("🔑 Loaded key from UserDefaults")
             return existingKey
         }
         
@@ -123,7 +123,7 @@ public enum KKSecureKeyGenerator {
         userDefaults.set(keyValue, forKey: secureKeyPreferenceKey)
         userDefaults.synchronize()
         
-        print("🔑 Generated + saved new key")
+        debugPrint("🔑 Generated + saved new key")
         return keyValue
     }
     
@@ -139,7 +139,7 @@ public enum KKSecureKeyGenerator {
     public static func resetKey() {
         UserDefaults.standard.removeObject(forKey: secureKeyPreferenceKey)
         UserDefaults.standard.synchronize()
-        print("🗑️  Secure key reset")
+        debugPrint("🗑️  Secure key reset")
     }
     
     // MARK: - Private Helpers

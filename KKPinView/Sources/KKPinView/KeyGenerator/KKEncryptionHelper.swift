@@ -96,21 +96,21 @@ public enum KKEncryptionHelper {
     /// ```
     public static func encryptData(_ data: Data, secureKey: String) -> Data? {
         guard !data.isEmpty, !secureKey.isEmpty else {
-            print("❌ EncryptData: Invalid input parameters")
+            debugPrint("❌ EncryptData: Invalid input parameters")
             return nil
         }
         
         do {
             // Derive key from secure key string
             guard let keyData = Data(base64Encoded: secureKey) else {
-                print("❌ EncryptData: Invalid base64 key")
+                debugPrint("❌ EncryptData: Invalid base64 key")
                 return nil
             }
             
             // Use first 32 bytes as key (AES-256 requires 32 bytes)
             let keyBytes = Array(keyData.prefix(32))
             guard keyBytes.count == 32 else {
-                print("❌ EncryptData: Key length must be 32 bytes")
+                debugPrint("❌ EncryptData: Key length must be 32 bytes")
                 return nil
             }
             
@@ -131,7 +131,7 @@ public enum KKEncryptionHelper {
             
             return combined
         } catch {
-            print("❌ Encryption error: \(error.localizedDescription)")
+            debugPrint("❌ Encryption error: \(error.localizedDescription)")
             return nil
         }
     }
@@ -165,28 +165,28 @@ public enum KKEncryptionHelper {
     ///   Using a different key will result in decryption failure.
     public static func decryptData(_ encryptedData: Data, secureKey: String) -> Data? {
         guard !encryptedData.isEmpty, !secureKey.isEmpty else {
-            print("❌ DecryptData: Invalid input parameters")
+            debugPrint("❌ DecryptData: Invalid input parameters")
             return nil
         }
         
         do {
             // Derive key from secure key string
             guard let keyData = Data(base64Encoded: secureKey) else {
-                print("❌ DecryptData: Invalid base64 key")
+                debugPrint("❌ DecryptData: Invalid base64 key")
                 return nil
             }
             
             // Use first 32 bytes as key (AES-256 requires 32 bytes)
             let keyBytes = Array(keyData.prefix(32))
             guard keyBytes.count == 32 else {
-                print("❌ DecryptData: Key length must be 32 bytes")
+                debugPrint("❌ DecryptData: Key length must be 32 bytes")
                 return nil
             }
             
             // Extract components
             // GCM nonce: 12 bytes, tag: 16 bytes, rest is ciphertext
             guard encryptedData.count >= 28 else {
-                print("❌ DecryptData: Encrypted data too short")
+                debugPrint("❌ DecryptData: Encrypted data too short")
                 return nil
             }
             
@@ -195,7 +195,7 @@ public enum KKEncryptionHelper {
             let ciphertextData = encryptedData.dropFirst(12).dropLast(16)
             
             guard let nonce = try? AES.GCM.Nonce(data: nonceData) else {
-                print("❌ DecryptData: Failed to extract nonce")
+                debugPrint("❌ DecryptData: Failed to extract nonce")
                 return nil
             }
             
@@ -214,7 +214,7 @@ public enum KKEncryptionHelper {
             
             return decryptedData
         } catch {
-            print("❌ Decryption error: \(error.localizedDescription)")
+            debugPrint("❌ Decryption error: \(error.localizedDescription)")
             return nil
         }
     }

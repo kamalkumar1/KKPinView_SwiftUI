@@ -155,10 +155,10 @@ struct KeypadButton: View {
         Color.white
         NumericKeypad(
             onNumberTap: { number in
-                print("Tapped: \(number)")
+                debugPrint("Tapped: \(number)")
             },
             onDeleteTap: {
-                print("Delete tapped")
+                debugPrint("Delete tapped")
             }
         )
     }

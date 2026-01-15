@@ -262,7 +262,7 @@ public struct KKPINSetUPView: View {
 #Preview {
     KKPINSetUPView(
         onSetupComplete: { pin in
-            print("PIN setup completed: \(pin)")
+            debugPrint("PIN setup completed: \(pin)")
         }
     )
 }
