@@ -11,6 +11,7 @@ import KKPinView
 struct ContentView: View {
     @State private var code: String = ""
     var body: some View {
+       
         if(KKPinStorage.hasStoredPIN())
         {
             KKPinViews(

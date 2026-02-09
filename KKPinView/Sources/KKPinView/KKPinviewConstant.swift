@@ -11,58 +11,58 @@ import SwiftUI
 @available(iOS 15.0, *)
 public struct KKPinviewConstant {
     // MARK: - Field Type
-    public static let defaultTextFieldType: PinTextFieldType = .roundCorner
+    nonisolated(unsafe) public static var defaultTextFieldType: PinTextFieldType = .roundCorner
     
     // MARK: - Colors
     // Gradient Colors
   
     // Background and UI Colors
-    public static let backgroundColor: Color = Color.white
-    public static let fieldBackgroundColor: Color = Color.gray.opacity(0.1)
-    public static let fieldStrokeColor: Color = Color.gray.opacity(0.3)
-    public static let fieldStrokeWidth: CGFloat = 1.0
-    public static let textColor: Color = .black
-    public static let subtitleTextColor: Color = .gray
-    public static let buttonTextColor: Color = .black
-    public static let forgotPinTextColor: Color = .blue
-    public static let errorTextColor: Color = .red
-    public static let successTextColor: Color = .green
+    nonisolated(unsafe) public static var backgroundColor: Color = Color.white
+    nonisolated(unsafe) public static var fieldBackgroundColor: Color = Color.gray.opacity(0.1)
+    nonisolated(unsafe) public static var fieldStrokeColor: Color = Color.gray.opacity(0.3)
+    nonisolated(unsafe) public static var fieldStrokeWidth: CGFloat = 1.0
+    nonisolated(unsafe) public static var textColor: Color = .black
+    nonisolated(unsafe) public static var subtitleTextColor: Color = .gray
+    nonisolated(unsafe) public static var buttonTextColor: Color = .black
+    nonisolated(unsafe) public static var forgotPinTextColor: Color = .blue
+    nonisolated(unsafe) public static var errorTextColor: Color = .red
+    nonisolated(unsafe) public static var successTextColor: Color = .green
     
     // MARK: - Font Sizes
-    public static let titleFontSize: CGFloat = 30
-    public static let subtitleFontSize: CGFloat = 15
-    public static let normalFontSize: CGFloat = 24
-    public static let smallFontSize: CGFloat = 8
-    public static let deleteButtonFontSize: CGFloat = 24
-    public static let numberButtonFontSize: CGFloat = 28
-    public static let forgotPinFontSize: CGFloat = 14
-    public static let errorMessageFontSize: CGFloat = 14
-    public static let successMessageFontSize: CGFloat = 16
-    public static let headingFontSize: CGFloat = 24
+    nonisolated(unsafe) public static var titleFontSize: CGFloat = 30
+    nonisolated(unsafe) public static var subtitleFontSize: CGFloat = 15
+    nonisolated(unsafe) public static var normalFontSize: CGFloat = 24
+    nonisolated(unsafe) public static var smallFontSize: CGFloat = 8
+    nonisolated(unsafe) public static var deleteButtonFontSize: CGFloat = 24
+    nonisolated(unsafe) public static var numberButtonFontSize: CGFloat = 28
+    nonisolated(unsafe) public static var forgotPinFontSize: CGFloat = 14
+    nonisolated(unsafe) public static var errorMessageFontSize: CGFloat = 14
+    nonisolated(unsafe) public static var successMessageFontSize: CGFloat = 16
+    nonisolated(unsafe) public static var headingFontSize: CGFloat = 24
     
     // MARK: - Dimensions
-    public static let totalDigits: Int = 4
-    public static let fieldHeight: CGFloat = 70
-    public static let buttonSize: CGFloat = 70
-    public static let fieldSpacing: CGFloat = 12
-    public static let keypadSpacing: CGFloat = 16
-    public static let keypadHorizontalPadding: CGFloat = 24
-    public static let keypadVerticalPadding: CGFloat = 20
+    nonisolated(unsafe) public static var totalDigits: Int = 4
+    nonisolated(unsafe) public static var fieldHeight: CGFloat = 70
+    nonisolated(unsafe) public static var buttonSize: CGFloat = 70
+    nonisolated(unsafe) public static var fieldSpacing: CGFloat = 12
+    nonisolated(unsafe) public static var keypadSpacing: CGFloat = 16
+    nonisolated(unsafe) public static var keypadHorizontalPadding: CGFloat = 24
+    nonisolated(unsafe) public static var keypadVerticalPadding: CGFloat = 20
     
     // MARK: - PIN Validation Limits
-    public static let maxPinAttempts: Int = 5
-    public static let pinLockoutDurationMinutes: Int = 5
+    nonisolated(unsafe) public static var maxPinAttempts: Int = 5
+    nonisolated(unsafe) public static var pinLockoutDurationMinutes: Int = 5
     
     // MARK: - Font Weights
-    public static let titleFontWeight: Font.Weight = .bold
-    public static let subtitleFontWeight: Font.Weight = .semibold
-    public static let normalFontWeight: Font.Weight = .medium
-    public static let deleteButtonFontWeight: Font.Weight = .medium
-    public static let numberButtonFontWeight: Font.Weight = .semibold
-    public static let forgotPinFontWeight: Font.Weight = .regular
-    public static let errorMessageFontWeight: Font.Weight = .medium
-    public static let successMessageFontWeight: Font.Weight = .semibold
-    public static let headingFontWeight: Font.Weight = .bold
+    nonisolated(unsafe) public static var titleFontWeight: Font.Weight = .bold
+    nonisolated(unsafe) public static var subtitleFontWeight: Font.Weight = .semibold
+    nonisolated(unsafe) public static var normalFontWeight: Font.Weight = .medium
+    nonisolated(unsafe) public static var deleteButtonFontWeight: Font.Weight = .medium
+    nonisolated(unsafe) public static var numberButtonFontWeight: Font.Weight = .semibold
+    nonisolated(unsafe) public static var forgotPinFontWeight: Font.Weight = .regular
+    nonisolated(unsafe) public static var errorMessageFontWeight: Font.Weight = .medium
+    nonisolated(unsafe) public static var successMessageFontWeight: Font.Weight = .semibold
+    nonisolated(unsafe) public static var headingFontWeight: Font.Weight = .bold
     
     // MARK: - Strings
     public static let titleTextFormat: String = "Enter %d-Digit Code"
